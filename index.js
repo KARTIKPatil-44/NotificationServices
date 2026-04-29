@@ -1,0 +1,23 @@
+const express = require("express");
+const bodyParse = require("body-parser");
+const env = require("dotenv");
+const mongoose = require("mongoose");
+
+const app = express();
+env.config();
+app.use(bodyParse.json());
+app.use(bodyParse.urlencoded({ extended: true }));
+
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.DB_URL);
+    console.log("Successfully connected to mongodb");
+    app.listen(process.env.PORT, () => {
+      console.log("Notification server started successfully");
+    });
+  } catch (error) {
+    console.log("Not able to connect to mongodb");
+  }
+};
+
+startServer();
