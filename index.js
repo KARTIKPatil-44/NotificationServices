@@ -2,11 +2,18 @@ const express = require("express");
 const bodyParse = require("body-parser");
 const env = require("dotenv");
 const mongoose = require("mongoose");
+
 const sendMail = require("./services/email.service")
 const app = express();
+
+const tiketRoutes = require ("./routes/ticket.route");
+
 env.config();
 app.use(bodyParse.json());
 app.use(bodyParse.urlencoded({ extended: true }));
+
+tiketRoutes(app);
+
 
 const startServer = async () => {
   try {
@@ -15,7 +22,7 @@ const startServer = async () => {
 
     app.listen(process.env.PORT, () => {
       console.log("Notification server started successfully");
-      sendMail(process.env.EMAIL, process.env.EMAIL_PASS);
+      // sendMail(process.env.EMAIL, process.env.EMAIL_PASS);
 
     });
   } catch (error) {
