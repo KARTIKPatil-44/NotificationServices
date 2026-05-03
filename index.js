@@ -3,7 +3,7 @@ const bodyParse = require("body-parser");
 const env = require("dotenv");
 const mongoose = require("mongoose");
 
-const sendMail = require("./services/email.service")
+const Cron = require ("./crons/cron");
 const app = express();
 
 const tiketRoutes = require ("./routes/ticket.route");
@@ -28,6 +28,7 @@ const startServer = async () => {
   } catch (error) {
     console.log("Not able to connect to mongodb");
   }
+  Cron.mailerCron();
 };
 
 startServer();
