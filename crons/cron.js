@@ -10,27 +10,31 @@ const mailerCron = () => {
       status: "PENDING",
     });
 
-    notificationsToBeSent.forEach(notification =>{
-        const mailData = {
-            from: process.env.EMAIL,
-            to: notification.recepientEmails,
-            subject: notification.subject,
-            text: notification.content
-        };
-        mailer.sendMail(mailData, async (err , data) =>{
-            if(err){
-                console.log(err);
-            }else{
-                console.log(data);
-                const savedNotification = await Ticket.findOne({_id: notification._id});
-                savedNotification.status = "SUCCESS";
-                await savedNotification.save();
-            }
-        })
-    }) 
+    notificationsToBeSent.forEach((notification) => {
+      console.log("Notification ID:", notification._id);
+      console.log("Recipients:", notification.recepientEmails);
+      const mailData = {
+        from:process.env.EMAIL,
+        to: notification.recepientEmails,
+        subject: notification.subject,
+        text: notification.content,
+      };
+      mailer.sendMail(mailData, async (err, data) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(data);
+          const savedNotification = await Ticket.findOne({
+            _id: notification._id,
+          });
+          savedNotification.status = "SUCCESS";
+          await savedNotification.save();
+        }
+      });
+    });
   });
 };
 
 module.exports = {
-    mailerCron,
-}
+  mailerCron,
+};
