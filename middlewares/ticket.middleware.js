@@ -20,7 +20,7 @@ const verifyTicketNotificationCreateRequest = async (req, res, next) => {
     return res.status(STATUS_CODES.BAD_REQUEST).json(errorResponseBody);
   }
   next();
-};
+};  
 
 module.exports = {
     verifyTicketNotificationCreateRequest,
