@@ -14,15 +14,18 @@ app.use(bodyParse.urlencoded({ extended: true }));
 
 tiketRoutes(app);
 
-app.listen(process.env.PORT, async () => {
-  console.log("Notification server started");
+app.listen(process.env.PORT, async ()=>{
+  console.log(`Notification server started`);
   try {
-    await mongoose.connect(process.env.DB_URL);
-    console.log("Successfully connected to mongo");
+    if(process.env.NODE_ENV === "production"){
+      await mongoose.connect(process.env.PROD_DB_URL);
+    }else{
+      await mongoose.connect(process.env.DB_URL);
+    }
+    console.log("Successfully connected to mongo")
   } catch (error) {
     console.log(error);
   }
-  Cron.mailerCron()
-});
+})
 
 
