@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParse = require("body-parser");
 const env = require("dotenv");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const Cron = require ("./crons/cron");
 const app = express();
@@ -9,10 +10,15 @@ const app = express();
 const tiketRoutes = require ("./routes/ticket.route");
 
 env.config();
+
+// configuring CORS
+app.use(cors());
+
 app.use(bodyParse.json());
 app.use(bodyParse.urlencoded({ extended: true }));
 
 tiketRoutes(app);
+Cron.mailerCron();
 
 app.listen(process.env.PORT, async ()=>{
   console.log(`Notification server started`);
