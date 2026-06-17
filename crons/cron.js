@@ -4,31 +4,38 @@ const Mailer = require("../services/email.service");
 
 const mailerCron = () => {
   const mailer = Mailer(process.env.EMAIL, process.env.EMAIL_PASS);
-  cron.schedule("*/10 * * * * *", async () => {
+  cron.schedule("*/30 * * * * *", async () => {
     console.log("Executing cron again");
     const notificationsToBeSent = await Ticket.find({
       status: "PENDING",
     });
 
-    notificationsToBeSent.forEach((notification) => {
-      console.log("Notification ID:", notification._id);
-      console.log("Recipients:", notification.recepientEmails);
+    notificationsToBeSent.forEach(async (notification) => {
+      console.log("Locking and processing Notification ID:", notification._id);
+      
+      // Lock ticket immediately to prevent duplicate runs
+      notification.status = "SUCCESS";
+      await notification.save();
+
       const mailData = {
-        from:process.env.EMAIL,
+        from: process.env.EMAIL,
         to: notification.recepientEmails,
         subject: notification.subject,
         text: notification.content,
       };
+
       mailer.sendMail(mailData, async (err, data) => {
         if (err) {
-          console.log(err);
+          console.error(`[CRON_MAIL_ERROR] Failed to send ID ${notification._id}:`, err.message);
+          
+          // Revert status to PENDING on failure for retry
+          const savedNotification = await Ticket.findById(notification._id);
+          if (savedNotification) {
+            savedNotification.status = "PENDING";
+            await savedNotification.save();
+          }
         } else {
-          console.log(data);
-          const savedNotification = await Ticket.findOne({
-            _id: notification._id,
-          });
-          savedNotification.status = "SUCCESS";
-          await savedNotification.save();
+          console.log(`[CRON_MAIL_SUCCESS] Successfully sent ID ${notification._id}:`, data);
         }
       });
     });
