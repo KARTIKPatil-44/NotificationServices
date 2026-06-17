@@ -8,7 +8,7 @@ const mailer = (userId, password) => {
       if (process.env.RESEND_API_KEY) {
         try {
           console.log("[MAILER] Attempting to send email via Resend API...");
-          const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+          const fromEmail = process.env.RESEND_FROM_EMAIL || "CineVerse <onboarding@resend.dev>";
           
           const response = await fetch("https://api.resend.com/emails", {
             method: "POST",
